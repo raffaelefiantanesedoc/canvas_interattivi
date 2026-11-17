@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Interattivi - Laboratorio Didattico Digitale</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0b1120;
+            color: #f1f5f9;
+        }
+        .font-cinzel {
+            font-family: 'Cinzel', serif;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(245, 158, 11, 0.35);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(245, 158, 11, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-500 selection:text-slate-950">
+
+    <!-- Navbar -->
+    <header class="border-b border-slate-800/80 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3.5">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-slate-950 text-xl font-black shadow-lg shadow-amber-500/20">
+                    <i class="fa-solid fa-shapes"></i>
+                </div>
+                <div>
+                    <h1 class="font-cinzel text-xl font-bold tracking-wide text-amber-300">Canvas Interattivi</h1>
+                    <p class="text-xs text-slate-400">Laboratorio di Strumenti e Risorse Didattiche</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <a href="https://github.com/raffaelefiantanesedoc/canvas_interattivi" target="_blank" rel="noopener noreferrer" 
+                   class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold flex items-center space-x-2 border border-slate-700/60 transition">
+                    <i class="fa-brands fa-github text-sm"></i>
+                    <span>Repository</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-6 py-12 flex-grow w-full">
+        <!-- Hero Section -->
+        <section class="text-center max-w-2xl mx-auto mb-14">
+            <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium mb-4">
+                <i class="fa-solid fa-sparkles"></i>
+                <span>Apprendimento Attivo & Didattica Digitale</span>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight mb-4 font-cinzel">
+                Esplora i Canvas Interattivi
+            </h2>
+            <p class="text-slate-400 text-sm md:text-base leading-relaxed">
+                Una collezione di applicazioni web, laboratori interattivi e giochi educativi progettati per favorire l'apprendimento intuitivo e guidato.
+            </p>
+        </section>
+
+        <!-- Activities Grid -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <!-- Card 1: Latina Syntaxis -->
+            <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between">
+                <div class="p-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 text-2xl shadow-inner">
+                            <i class="fa-solid fa-scroll"></i>
+                        </div>
+                        <span class="text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                            Latino
+                        </span>
+                    </div>
+
+                    <h3 class="font-cinzel text-xl font-bold text-slate-100 mb-2">
+                        Latina Syntaxis
+                    </h3>
+                    <p class="text-xs font-medium text-amber-400/90 mb-3">
+                        Il Detective delle Frasi &bull; Metodo Valenziale
+                    </p>
+                    <p class="text-slate-400 text-xs leading-relaxed mb-4">
+                        Palestra interattiva di traduzione e analisi sintattica. Identifica il verbo motore, argomenti nucleari e circostanziali attraverso un'esperienza ludica guidata.
+                    </p>
+
+                    <div class="flex flex-wrap gap-1.5 mb-6">
+                        <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700/50">Metodo Valenziale</span>
+                        <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700/50">Analisi Logica</span>
+                        <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded border border-slate-700/50">Gamification</span>
+                    </div>
+                </div>
+
+                <div class="p-6 pt-0">
+                    <a href="latina_syntaxis_gioco_di_traduzione.html" 
+                       class="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-bold text-xs flex items-center justify-center space-x-2 shadow-lg shadow-amber-500/20 transition">
+                        <span>Avvia Attività</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Card 2: Upcoming canvas placeholder -->
+            <div class="glass-card rounded-2xl overflow-hidden flex flex-col justify-between border-dashed border-slate-700/70 opacity-75 hover:opacity-100">
+                <div class="p-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-center text-slate-500 text-2xl">
+                            <i class="fa-solid fa-compass-drafting"></i>
+                        </div>
+                        <span class="text-[11px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-md bg-slate-800 text-slate-400 border border-slate-700">
+                            In sviluppo
+                        </span>
+                    </div>
+
+                    <h3 class="font-cinzel text-xl font-bold text-slate-300 mb-2">
+                        Nuovi Laboratori
+                    </h3>
+                    <p class="text-xs font-medium text-slate-400 mb-3">
+                        Prossime Attività Interattive
+                    </p>
+                    <p class="text-slate-500 text-xs leading-relaxed mb-4">
+                        Altri canvas e strumenti dedicati alla visualizzazione logico-grammaticale, testi classici e attività multimediali sono in preparazione.
+                    </p>
+                </div>
+
+                <div class="p-6 pt-0">
+                    <button disabled 
+                            class="w-full py-2.5 px-4 rounded-xl bg-slate-800/60 text-slate-500 font-semibold text-xs flex items-center justify-center space-x-2 cursor-not-allowed border border-slate-700/50">
+                        <i class="fa-solid fa-clock"></i>
+                        <span>Prossimamente</span>
+                    </button>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 bg-slate-900/60 py-6 mt-12 text-center text-xs text-slate-500">
+        <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p>&copy; 2026 Raffaele Fiantanese &bull; Risorse Didattiche Interattive</p>
+            <p class="flex items-center space-x-1.5">
+                <span>Distribuito con</span>
+                <i class="fa-brands fa-github text-slate-400"></i>
+                <a href="https://github.com/raffaelefiantanesedoc/canvas_interattivi" class="text-amber-400 hover:underline">GitHub Pages</a>
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>
