@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latina Syntaxis - Il Detective delle Frasi</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .font-cinzel { font-family: 'Cinzel', serif; }
+        .glass-panel { background: rgba(30, 41, 59, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-slate-900/90 px-6 py-4 sticky top-0 z-50 glass-panel">
+        <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-xl shadow-inner">
+                    <i class="fa-solid fa-scroll"></i>
+                </div>
+                <div>
+                    <h1 class="font-cinzel text-xl font-bold text-amber-300 tracking-wide">Latina Syntaxis</h1>
+                    <p class="text-xs text-slate-400">Palestra di Traduzione col Metodo Valenziale</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button onclick="openCreatorModal()" class="px-3.5 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/50 text-amber-300 hover:bg-amber-500/30 text-xs font-semibold flex items-center space-x-1.5 transition">
+                    <i class="fa-solid fa-plus-circle"></i>
+                    <span>Aggiungi Frase</span>
+                </button>
+                <div class="text-right">
+                    <span class="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">Punteggio</span>
+                    <span id="score-display" class="text-xl font-bold text-amber-400">0</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">Frase</span>
+                    <span id="level-display" class="text-base font-bold text-slate-200">1 / 1</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto w-full p-4 md:p-6 flex-grow flex flex-col justify-center">
+
+        <!-- Game Card -->
+        <div id="game-card" class="glass-panel rounded-2xl p-5 md:p-8 shadow-2xl relative">
+            
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-800 h-2 rounded-full mb-6 overflow-hidden">
+                <div id="progress-bar" class="bg-amber-500 h-full w-0 transition-all duration-500"></div>
+            </div>
+
+            <!-- Top Controls -->
+            <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+                <span id="step-badge" class="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-indigo-950 text-indigo-300 border border-indigo-800">
+                    Fase 1: Il Verbo
+                </span>
+                <div class="flex items-center space-x-2">
+                    <button onclick="showHint()" class="text-xs text-amber-400 hover:text-amber-300 flex items-center space-x-1 bg-amber-950/40 border border-amber-800/60 px-3 py-1.5 rounded-lg transition">
+                        <i class="fa-solid fa-book-bookmark"></i> <span>Dizionario / Aiuto</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Latin Sentence Display -->
+            <div class="bg-slate-900/90 rounded-xl p-5 border border-slate-700/60 mb-6 text-center">
+                <p class="text-xs uppercase tracking-widest text-slate-400 mb-2 font-semibold">Frase Latina da analizzare:</p>
+                <p id="latin-sentence-display" class="text-xl md:text-2xl font-cinzel font-bold text-amber-200 tracking-wide select-all py-2"></p>
+            </div>
+
+            <!-- Grammatical Reference Card (Displayed only for Frase 1) -->
+            <div id="grammar-helper" class="mb-6 p-4 rounded-xl bg-slate-900/60 border border-slate-800 text-xs text-slate-300 leading-relaxed">
+                <!-- Helper text injected per step -->
+            </div>
+
+            <!-- Step Interactive Content -->
+            <div id="step-container" class="space-y-4">
+                <!-- Step questions rendered here -->
+            </div>
+
+            <!-- Feedback Message -->
+            <div id="feedback-box" class="hidden mt-6 p-4 rounded-xl text-sm font-medium transition-all"></div>
+
+            <!-- Action Navigation -->
+            <div class="mt-6 flex justify-between items-center border-t border-slate-800 pt-5">
+                <button id="prev-btn" onclick="previousStep()" class="hidden px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition text-xs font-semibold">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Precedente
+                </button>
+                <div class="ml-auto flex space-x-3">
+                    <button id="check-btn" onclick="checkCurrentStep()" class="px-6 py-2.5 rounded-xl bg-amber-500 text-slate-950 hover:bg-amber-400 transition font-bold text-sm shadow-lg shadow-amber-500/20">
+                        Verifica Risposta <i class="fa-solid fa-check ml-1"></i>
+                    </button>
+                    <button id="next-btn" onclick="nextStep()" class="hidden px-6 py-2.5 rounded-xl bg-emerald-600 text-white hover:bg-emerald-500 transition font-bold text-sm shadow-lg shadow-emerald-600/20">
+                        Passaggio Successivo <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                    <button id="next-case-btn" onclick="loadNextCase()" class="hidden px-6 py-2.5 rounded-xl bg-amber-500 text-slate-950 hover:bg-amber-400 transition font-bold text-sm shadow-lg shadow-amber-500/20">
+                        Prossima Frase <i class="fa-solid fa-trophy ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Modal: Dictionary Hint -->
+    <div id="hint-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-md w-full p-6 relative shadow-2xl">
+            <button onclick="closeHint()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="flex items-center space-x-3 mb-4 text-amber-400">
+                <i class="fa-solid fa-book-bookmark text-2xl"></i>
+                <h3 class="font-cinzel text-lg font-bold">Consultazione Dizionario</h3>
+            </div>
+            <div id="hint-content" class="text-sm text-slate-300 space-y-3 leading-relaxed">
+                <!-- Injected content -->
+            </div>
+            <button onclick="closeHint()" class="w-full mt-6 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-sm font-semibold">
+                Ho capito!
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal: Creator / Add Sentence -->
+    <div id="creator-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full p-6 relative shadow-2xl my-8">
+            <button onclick="closeCreatorModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <div class="flex items-center space-x-3 mb-6 text-amber-400">
+                <i class="fa-solid fa-pen-to-square text-2xl"></i>
+                <div>
+                    <h3 class="font-cinzel text-xl font-bold">Aggiungi Nuova Frase</h3>
+                    <p class="text-xs text-slate-400">Inserisci i dati per l'analisi valenziale e le domande sui casi</p>
+                </div>
+            </div>
+
+            <form id="creator-form" onsubmit="saveCustomSentence(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Frase Latina Completa:</label>
+                    <input type="text" id="custom-latin" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-amber-200 focus:outline-none focus:border-amber-500" placeholder="Es. Discipulae sedulae epistulam magistrae mittunt.">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Parola Verbo nel testo:</label>
+                        <input type="text" id="custom-pv" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200" placeholder="mittunt">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Paradigma del Verbo per esteso:</label>
+                        <input type="text" id="custom-pv-decl" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200" placeholder="mitto, mittis, misi, missum, mittere">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-blue-400 mb-1">Soggetto A1 (parola e declinazione per esteso):</label>
+                        <input type="text" id="custom-a1" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 mb-2" placeholder="Discipulae">
+                        <input type="text" id="custom-a1-decl" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-300" placeholder="discipula, discipulae">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-emerald-400 mb-1">Oggetto A2 (parola e declinazione):</label>
+                        <input type="text" id="custom-a2" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 mb-2" placeholder="epistulam (se assente inserisci 'nessuno')">
+                        <input type="text" id="custom-a2-decl" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-300" placeholder="epistula, epistulae">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-amber-400 mb-1">Termine A3 (parola e declinazione):</label>
+                        <input type="text" id="custom-a3" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 mb-2" placeholder="magistrae (se assente inserisci 'nessuno')">
+                        <input type="text" id="custom-a3-decl" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-300" placeholder="magistra, magistrae">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Traduzione Italiana Finale:</label>
+                    <input type="text" id="custom-translation" required class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200" placeholder="Le diligenti alunne inviano una lettera alla maestra.">
+                </div>
+
+                <div class="border-t border-slate-800 pt-3">
+                    <label class="block text-xs font-semibold text-indigo-300 mb-1">Domanda sui Casi di Fine Frase:</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <input type="text" id="custom-case-q" required class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200" placeholder="Es. Come si traduce 'discipularum'?">
+                        <input type="text" id="custom-case-a" required class="bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200" placeholder="Es. delle alunne">
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center pt-3 border-t border-slate-800">
+                    <button type="button" onclick="resetToDefaultCases()" class="text-xs text-rose-400 hover:text-rose-300">
+                        <i class="fa-solid fa-rotate-left mr-1"></i> Ripristina Frasi Predefinite
+                    </button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-amber-500 text-slate-950 font-bold text-sm hover:bg-amber-400">
+                        Salva Frase <i class="fa-solid fa-save ml-1"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800/80 bg-slate-950 py-3 px-6 text-center text-xs text-slate-500">
+        Latina Syntaxis &copy; Metodo Valenziale - Liceo Classico
+    </footer>
+
+    <script>
+        // Database con frasi ed esercizio sui casi a fine frase
+        const defaultCases = [
+            {
+                id: 1,
+                latin: "Discipulae sedulae epistulam magistrae mittunt.",
+                pv: "mittunt",
+                pvDecl: "mitto, mittis, misi, missum, mittere",
+                a1: "Discipulae",
+                a1Case: "Nominativo",
+                a1Decl: "discipula, discipulae",
+                a2: "epistulam",
+                a2Case: "Accusativo",
+                a2Decl: "epistula, epistulae",
+                a3: "magistrae",
+                a3Case: "Dativo",
+                a3Decl: "magistra, magistrae",
+                dictionary: `
+                    <strong>mitto, -is, misi, missum, -ere</strong>: inviare.<br>
+                    <strong>discipula, -ae</strong> (f.): alunna.<br>
+                    <strong>sedulus, -a, -um</strong>: diligente.<br>
+                    <strong>epistula, -ae</strong> (f.): lettera.<br>
+                    <strong>magistra, -ae</strong> (f.): maestra.
+                `,
+                translation: "Le diligenti alunne inviano una lettera alla maestra.",
+                caseQuestions: [
+                    {
+                        question: "Come si traduce la parola 'discipularum' (Genitivo plurale)?",
+                        answer: "delle alunne"
+                    },
+                    {
+                        question: "A quale caso si trova la parola 'magistrae' in questa frase?",
+                        answer: "dativo"
+                    }
+                ]
+            },
+            {
+                id: 2,
+                latin: "Invidia Marco nocet.",
+                pv: "nocet",
+                pvDecl: "noceo, noces, nocui, nocitum, nocere",
+                a1: "Invidia",
+                a1Case: "Nominativo",
+                a1Decl: "invidia, invidiae",
+                a2: "nessuno",
+                a2Case: "-",
+                a2Decl: "-",
+                a3: "Marco",
+                a3Case: "Dativo",
+                a3Decl: "Marcus, Marci",
+                dictionary: `
+                    <strong>noceo, -es, nocui, nocitum, -ere (+ dat.)</strong>: nuocere a, danneggiare.<br>
+                    <em>REGGENZA:</em> Regge il DATIVO (alicui)! In italiano si traduce come Complemento Oggetto.<br>
+                    <strong>invidia, -ae</strong> (f.): invidia.<br>
+                    <strong>Marcus, -i</strong> (m.): Marco.
+                `,
+                translation: "L'invidia danneggia Marco.",
+                caseQuestions: [
+                    {
+                        question: "In che caso è la parola 'Marco' e qual è il suo nominativo singolare?",
+                        answer: "dativo, marcus"
+                    }
+                ]
+            },
+            {
+                id: 3,
+                latin: "Poetae claris templis pulchra dona praebent.",
+                pv: "praebent",
+                pvDecl: "praebo, praebes, praebui, praebitum, praebere",
+                a1: "Poetae",
+                a1Case: "Nominativo",
+                a1Decl: "poeta, poetae",
+                a2: "dona",
+                a2Case: "Accusativo",
+                a2Decl: "donum, doni",
+                a3: "templis",
+                a3Case: "Dativo",
+                a3Decl: "templum, templi",
+                dictionary: `
+                    <strong>praebo, -es, praebui, praebitum, -ere</strong>: offrire.<br>
+                    <strong>poeta, -ae</strong> (m.): poeta.<br>
+                    <strong>templum, -i</strong> (NEUTRO 2ª decl.): tempio.<br>
+                    <strong>donum, -i</strong> (NEUTRO 2ª decl.): dono.
+                `,
+                translation: "I poeti offrono bei doni ai famosi templi.",
+                caseQuestions: [
+                    {
+                        question: "Perché la parola 'dona' esce in -A anche se è un complemento oggetto (Accusativo plurale)?",
+                        answer: "perche e neutro"
+                    }
+                ]
+            }
+        ];
+
+        let cases = [];
+        let currentCaseIdx = 0;
+        let currentStepIdx = 0;
+        let score = 0;
+
+        window.onload = function() {
+            loadDatabase();
+            loadCase(0);
+        };
+
+        function loadDatabase() {
+            const saved = localStorage.getItem("latina_cases_db_v2");
+            if (saved) {
+                try {
+                    cases = JSON.parse(saved);
+                } catch(e) {
+                    cases = [...defaultCases];
+                }
+            } else {
+                cases = [...defaultCases];
+            }
+        }
+
+        function saveDatabase() {
+            localStorage.setItem("latina_cases_db_v2", JSON.stringify(cases));
+        }
+
+        function resetToDefaultCases() {
+            if (confirm("Vuoi ripristinare le frasi predefinite? Le frasi aggiunte verranno cancellate.")) {
+                cases = [...defaultCases];
+                saveDatabase();
+                closeCreatorModal();
+                loadCase(0);
+            }
+        }
+
+        function loadCase(idx) {
+            if (idx >= cases.length) idx = 0;
+            currentCaseIdx = idx;
+            currentStepIdx = 0;
+            
+            const cData = cases[currentCaseIdx];
+            document.getElementById("level-display").innerText = `${currentCaseIdx + 1} / ${cases.length}`;
+            document.getElementById("latin-sentence-display").innerText = cData.latin;
+
+            renderStep();
+            updateProgressBar();
+        }
+
+        function getStepDefinition(stepIdx, cData) {
+            const isFirstSentence = (currentCaseIdx === 0);
+
+            switch(stepIdx) {
+                case 0: // FASE 1: VERBO
+                    return {
+                        title: "Fase 1: Individuazione del Verbo (PV)",
+                        badge: "Fase 1: Verbo",
+                        helper: isFirstSentence ? `
+                            <strong class="text-amber-300">COME SI TROVA IL VERBO (Solo Frase 1):</strong><br>
+                            1. Trova la voce verbale nella frase latina e scrivila nel primo campo.<br>
+                            2. <strong>Sul Dizionario:</strong> Ricorda che i verbi si cercano alla 1ª persona singolare dell'Indicativo Presente (in <strong>-O</strong>).<br>
+                            3. Nel secondo campo scrivi il <strong>paradigma completo per esteso</strong> (es. <em>paro, paras, paravi, paratum, parare</em>).
+                        ` : `<span class="text-slate-400 italic">Ora che conosci la regola, individua autonomamente il verbo e risali al suo paradigma sul dizionario!</span>`,
+                        questions: "verbo"
+                    };
+
+                case 1: // FASE 2: A1 SOGGETTO
+                    return {
+                        title: "Fase 2: Argomento A1 - Il Soggetto",
+                        badge: "Fase 2: A1 Soggetto",
+                        helper: isFirstSentence ? `
+                            <strong class="text-blue-300">COME SI TROVA A1 - SOGGETTO (Solo Frase 1):</strong><br>
+                            • Concords sempre col verbo e si trova al caso <strong>NOMINATIVO</strong>.<br>
+                            • 1ª Declinazione: Singolare in <code>-a</code> | Plurale in <code>-ae</code><br>
+                            • 2ª Declinazione Maschile: <code>-us / -er</code> (Sing) | <code>-i</code> (Plur)<br>
+                            • 2ª Declinazione NEUTRO: <code>-um</code> (Sing) | <code>-a</code> (Plur)<br>
+                            • Scrivi nel box il caso (Nominativo) e il nominativo/genitivo per esteso (es. <em>rosa, rosae</em>).
+                        ` : `<span class="text-slate-400 italic">Individua la parola che fa da Soggetto (A1), indica il suo caso grammaticale e la sua forma base per esteso.</span>`,
+                        questions: "a1"
+                    };
+
+                case 2: // FASE 3: A2 OGGETTO
+                    return {
+                        title: "Fase 3: Argomento A2 - Complemento Oggetto",
+                        badge: "Fase 3: A2 Oggetto",
+                        helper: isFirstSentence ? `
+                            <strong class="text-emerald-300">COME SI TROVA A2 - COMPLEMENTO OGGETTO (Solo Frase 1):</strong><br>
+                            • Risponde a <em>Chi? Che cosa?</em> e si trova in <strong>ACCUSATIVO</strong>.<br>
+                            • 1ª Declinazione: <code>-am</code> (Sing) | <code>-as</code> (Plur)<br>
+                            • 2ª Declinazione M/F: <code>-um</code> (Sing) | <code>-os</code> (Plur)<br>
+                            • 2ª Declinazione NEUTRO: <code>-um</code> (Sing) | <code>-a</code> (Plur)<br>
+                            • Se la frase non ha l'oggetto, scrivi <code>nessuno</code>.
+                        ` : `<span class="text-slate-400 italic">Cerca l'eventuale Argomento A2 in Accusativo. Se assente, scrivi 'nessuno'.</span>`,
+                        questions: "a2"
+                    };
+
+                case 3: // FASE 4: A3 TERMINE
+                    return {
+                        title: "Fase 4: Argomento A3 - Complemento di Termine / Reggenza",
+                        badge: "Fase 4: A3 Termine",
+                        helper: isFirstSentence ? `
+                            <strong class="text-amber-300">COME SI TROVA A3 - TERMINE (Solo Frase 1):</strong><br>
+                            • Risponde a <em>A chi? A che cosa?</em> e si trova in <strong>DATIVO</strong> (es. <code>-ae</code> / <code>-o</code> / <code>-is</code>) oppure è richiesto dalla reggenza del verbo (<code>+ dat.</code>).
+                        ` : `<span class="text-slate-400 italic">Individua l'eventuale Argomento A3 in Dativo. Se assente, scrivi 'nessuno'.</span>`,
+                        questions: "a3"
+                    };
+
+                case 4: // FASE 5: TRADUZIONE FINALE
+                    return {
+                        title: "Fase 5: Traduzione Finale Italiana",
+                        badge: "Fase 5: Traduzione",
+                        helper: `
+                            <strong class="text-indigo-300">ORDINE LOGICO:</strong> <code>[ A1 (Soggetto) ]</code> $\\rightarrow$ <code>[ PV (Verbo) ]</code> $\\rightarrow$ <code>[ A2 (Oggetto) ]</code> $\\rightarrow$ <code>[ A3 (Termine) ]</code>
+                        `,
+                        questions: "traduzione"
+                    };
+
+                case 5: // FASE 6: ESERCIZIO SUI CASI (MINI-TEST FINALE)
+                    return {
+                        title: "Fase 6: Mini-Test sui Casi della Frase",
+                        badge: "Fase 6: Esercizio Casi",
+                        helper: `
+                            <strong class="text-amber-400">ESERCIZIO SULLE FORME FLESSIVE:</strong><br>
+                            Rispondi alle domande sui casi e sulle forme delle parole presenti in questa frase per consolidare la conoscenza della declinazione!
+                        `,
+                        questions: "casi-test"
+                    };
+            }
+        }
+
+        function renderStep() {
+            const cData = cases[currentCaseIdx];
+            const stepDef = getStepDefinition(currentStepIdx, cData);
+            const container = document.getElementById("step-container");
+            
+            document.getElementById("step-badge").innerText = stepDef.badge;
+            document.getElementById("grammar-helper").innerHTML = stepDef.helper;
+
+            hideFeedback();
+
+            // Navigation Controls
+            document.getElementById("prev-btn").classList.toggle("hidden", currentStepIdx === 0);
+            document.getElementById("check-btn").classList.remove("hidden");
+            document.getElementById("next-btn").classList.add("hidden");
+            document.getElementById("next-case-btn").classList.add("hidden");
+
+            let html = `
+                <div class="border-b border-slate-800 pb-2">
+                    <h3 class="font-cinzel text-lg font-bold text-amber-300">${stepDef.title}</h3>
+                </div>
+            `;
+
+            if (stepDef.questions === "verbo") {
+                html += `
+                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">1. Scrivi la parola del VERBO presente nella frase latina:</label>
+                            <input type="text" id="input-pv" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-amber-300 focus:outline-none focus:border-amber-500" placeholder="Es. mittunt">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">2. Scrivi il PARADIGMA COMPLETO del verbo per esteso (es. rosa, rosae per i nomi o parare per i verbi):</label>
+                            <input type="text" id="input-pv-decl" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-pink-300 bg-pink-950/20 border-pink-800 focus:outline-none focus:border-pink-500" placeholder="Es. mitto, mittis, misi, missum, mittere">
+                        </div>
+                    </div>
+                `;
+            } else if (stepDef.questions === "a1") {
+                html += `
+                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-blue-300 mb-1">1. Scrivi la parola che fa da SOGGETTO (A1):</label>
+                            <input type="text" id="input-a1" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-blue-200 focus:outline-none focus:border-blue-500" placeholder="Es. Discipulae">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">2. In quale CASO si trova?</label>
+                                <input type="text" id="input-a1-case" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200" placeholder="Es. Nominativo">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-pink-300 mb-1">3. Forma base per esteso (es. rosa, rosae):</label>
+                                <input type="text" id="input-a1-decl" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-pink-300 bg-pink-950/20 border-pink-800" placeholder="Es. discipula, discipulae">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (stepDef.questions === "a2") {
+                html += `
+                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-emerald-300 mb-1">1. Scrivi la parola del COMPLEMENTO OGGETTO (A2) (oppure 'nessuno'):</label>
+                            <input type="text" id="input-a2" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-emerald-200 focus:outline-none focus:border-emerald-500" placeholder="Es. epistulam o nessuno">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">2. In quale CASO si trova?</label>
+                                <input type="text" id="input-a2-case" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200" placeholder="Es. Accusativo o -">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-pink-300 mb-1">3. Forma base per esteso (es. rosa, rosae):</label>
+                                <input type="text" id="input-a2-decl" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-pink-300 bg-pink-950/20 border-pink-800" placeholder="Es. epistula, epistulae">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (stepDef.questions === "a3") {
+                html += `
+                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 space-y-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-amber-300 mb-1">1. Scrivi la parola del COMPLEMENTO DI TERMINE (A3) (oppure 'nessuno'):</label>
+                            <input type="text" id="input-a3" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-amber-200 focus:outline-none focus:border-amber-500" placeholder="Es. magistrae o nessuno">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-1">2. In quale CASO si trova?</label>
+                                <input type="text" id="input-a3-case" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200" placeholder="Es. Dativo o -">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-pink-300 mb-1">3. Forma base per esteso (es. rosa, rosae):</label>
+                                <input type="text" id="input-a3-decl" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-pink-300 bg-pink-950/20 border-pink-800" placeholder="Es. magistra, magistrae">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else if (stepDef.questions === "traduzione") {
+                html += `
+                    <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 space-y-3">
+                        <label class="block text-xs font-semibold text-slate-200 mb-1">Scrivi o seleziona la traduzione italiana corretta della frase:</label>
+                        <input type="text" id="input-translation" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-amber-200 focus:outline-none focus:border-amber-500" placeholder="Scrivi qui la traduzione italiana intera...">
+                    </div>
+                `;
+            } else if (stepDef.questions === "casi-test") {
+                const qList = cData.caseQuestions || [
+                    { question: `Come si traduce la prima parola della frase ('${cData.a1}')?`, answer: cData.a1 }
+                ];
+
+                html += `<div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 space-y-4">`;
+                qList.forEach((qObj, qIdx) => {
+                    html += `
+                        <div>
+                            <label class="block text-xs font-semibold text-amber-300 mb-1">${qIdx + 1}. ${qObj.question}</label>
+                            <input type="text" id="input-case-test-${qIdx}" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-amber-500" placeholder="Rispondi qui...">
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            container.innerHTML = html;
+        }
+
+        function checkCurrentStep() {
+            const cData = cases[currentCaseIdx];
+            let isOk = false;
+
+            if (currentStepIdx === 0) { // VERBO
+                const pvVal = document.getElementById("input-pv").value.trim().toLowerCase();
+                const pvDeclVal = document.getElementById("input-pv-decl").value.trim().toLowerCase();
+
+                if (pvVal === cData.pv.toLowerCase() && pvDeclVal.length > 3) {
+                    isOk = true;
+                } else {
+                    showFeedback(`Controlla di aver scritto la parola del verbo corretta ("${cData.pv}") e di aver inserito il paradigma per esteso nel riquadro rosa!`, false);
+                }
+            } else if (currentStepIdx === 1) { // A1 SOGGETTO
+                const a1Val = document.getElementById("input-a1").value.trim().toLowerCase();
+                const a1CaseVal = document.getElementById("input-a1-case").value.trim().toLowerCase();
+                const a1DeclVal = document.getElementById("input-a1-decl").value.trim().toLowerCase();
+
+                if (a1Val === cData.a1.toLowerCase() && a1CaseVal.includes("nominativ") && a1DeclVal.length > 2) {
+                    isOk = true;
+                } else {
+                    showFeedback("Ricontrolla il Soggetto A1: dev'essere al Nominativo e devi inserire la sua declinazione per esteso nel riquadro rosa (es. discipula, discipulae).", false);
+                }
+            } else if (currentStepIdx === 2) { // A2 OGGETTO
+                const a2Val = document.getElementById("input-a2").value.trim().toLowerCase();
+                const expectedA2 = cData.a2.toLowerCase();
+
+                if (a2Val === expectedA2 || (expectedA2 === "nessuno" && (a2Val === "" || a2Val === "nessuno"))) {
+                    isOk = true;
+                } else {
+                    showFeedback(`Ricontrolla l'Oggetto A2: la risposta attesa è "${cData.a2}".`, false);
+                }
+            } else if (currentStepIdx === 3) { // A3 TERMINE
+                const a3Val = document.getElementById("input-a3").value.trim().toLowerCase();
+                const expectedA3 = cData.a3.toLowerCase();
+
+                if (a3Val === expectedA3 || (expectedA3 === "nessuno" && (a3Val === "" || a3Val === "nessuno"))) {
+                    isOk = true;
+                } else {
+                    showFeedback(`Ricontrolla il Termine A3: la risposta attesa è "${cData.a3}".`, false);
+                }
+            } else if (currentStepIdx === 4) { // TRADUZIONE
+                const transVal = document.getElementById("input-translation").value.trim().toLowerCase();
+                if (transVal.length > 5) {
+                    isOk = true;
+                } else {
+                    showFeedback("Inserisci una traduzione completa in italiano!", false);
+                }
+            } else if (currentStepIdx === 5) { // MINI TEST CASI
+                const qList = cData.caseQuestions || [];
+                let correctCount = 0;
+                
+                qList.forEach((qObj, qIdx) => {
+                    const ansInput = document.getElementById(`input-case-test-${qIdx}`);
+                    if (ansInput && ansInput.value.trim().length > 0) {
+                        correctCount++;
+                    }
+                });
+
+                if (correctCount === qList.length) {
+                    isOk = true;
+                } else {
+                    showFeedback("Rispondi a tutte le domande dell'esercizio sui casi!", false);
+                }
+            }
+
+            if (isOk) {
+                score += 15;
+                document.getElementById("score-display").innerText = score;
+                showFeedback("Risposta corretta! Eccellente lavoro di analisi.", true);
+                document.getElementById("check-btn").classList.add("hidden");
+
+                if (currentStepIdx < 5) {
+                    document.getElementById("next-btn").classList.remove("hidden");
+                } else {
+                    if (currentCaseIdx < cases.length - 1) {
+                        document.getElementById("next-case-btn").classList.remove("hidden");
+                    } else {
+                        showFeedback("Fantastico! Hai completato tutte le frasi e i relativi esercizi sui casi!", true);
+                    }
+                }
+            }
+        }
+
+        function nextStep() {
+            if (currentStepIdx < 5) {
+                currentStepIdx++;
+                renderStep();
+                updateProgressBar();
+            }
+        }
+
+        function previousStep() {
+            if (currentStepIdx > 0) {
+                currentStepIdx--;
+                renderStep();
+                updateProgressBar();
+            }
+        }
+
+        function loadNextCase() {
+            loadCase(currentCaseIdx + 1);
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentStepIdx + 1) / 6) * 100;
+            document.getElementById("progress-bar").style.width = `${progress}%`;
+        }
+
+        function showFeedback(msg, isSuccess) {
+            const box = document.getElementById("feedback-box");
+            box.classList.remove("hidden", "bg-emerald-950/90", "border-emerald-700", "text-emerald-200", "bg-rose-950/90", "border-rose-700", "text-rose-200");
+            
+            if (isSuccess) {
+                box.classList.add("bg-emerald-950/90", "border", "border-emerald-700", "text-emerald-200");
+                box.innerHTML = `<i class="fa-solid fa-circle-check mr-2 text-emerald-400"></i> ${msg}`;
+            } else {
+                box.classList.add("bg-rose-950/90", "border", "border-rose-700", "text-rose-200");
+                box.innerHTML = `<i class="fa-solid fa-circle-xmark mr-2 text-rose-400"></i> ${msg}`;
+            }
+        }
+
+        function hideFeedback() {
+            document.getElementById("feedback-box").classList.add("hidden");
+        }
+
+        function showHint() {
+            const cData = cases[currentCaseIdx];
+            document.getElementById("hint-content").innerHTML = cData.dictionary;
+            document.getElementById("hint-modal").classList.remove("hidden");
+        }
+
+        function closeHint() {
+            document.getElementById("hint-modal").classList.add("hidden");
+        }
+
+        // Creator Modal Functions
+        function openCreatorModal() {
+            document.getElementById("creator-modal").classList.remove("hidden");
+        }
+
+        function closeCreatorModal() {
+            document.getElementById("creator-modal").classList.add("hidden");
+        }
+
+        function saveCustomSentence(e) {
+            e.preventDefault();
+            const latinText = document.getElementById("custom-latin").value.trim();
+            const pv = document.getElementById("custom-pv").value.trim();
+            const pvDecl = document.getElementById("custom-pv-decl").value.trim();
+            const a1 = document.getElementById("custom-a1").value.trim();
+            const a1Decl = document.getElementById("custom-a1-decl").value.trim();
+            const a2 = document.getElementById("custom-a2").value.trim() || "nessuno";
+            const a2Decl = document.getElementById("custom-a2-decl").value.trim() || "-";
+            const a3 = document.getElementById("custom-a3").value.trim() || "nessuno";
+            const a3Decl = document.getElementById("custom-a3-decl").value.trim() || "-";
+            const translation = document.getElementById("custom-translation").value.trim();
+            const qText = document.getElementById("custom-case-q").value.trim();
+            const aText = document.getElementById("custom-case-a").value.trim();
+
+            const newCase = {
+                id: Date.now(),
+                latin: latinText,
+                pv: pv,
+                pvDecl: pvDecl,
+                a1: a1,
+                a1Case: "Nominativo",
+                a1Decl: a1Decl,
+                a2: a2,
+                a2Case: a2 !== "nessuno" ? "Accusativo" : "-",
+                a2Decl: a2Decl,
+                a3: a3,
+                a3Case: a3 !== "nessuno" ? "Dativo" : "-",
+                a3Decl: a3Decl,
+                dictionary: `Note grammaticali per la frase inserita.`,
+                translation: translation,
+                caseQuestions: [
+                    { question: qText, answer: aText }
+                ]
+            };
+
+            cases.push(newCase);
+            saveDatabase();
+            closeCreatorModal();
+            document.getElementById("creator-form").reset();
+            loadCase(cases.length - 1);
+            showFeedback("Nuova frase creata con successo con le domande sui casi!", true);
+        }
+    </script>
+</body>
+</html>
